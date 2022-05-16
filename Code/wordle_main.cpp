@@ -4,17 +4,16 @@
 #include <vector>
 #include "wordle_funcs.h"
 
-using namespace std;
-
 
 	int main(){
 		
-		ifstream datafile;
-		datafile.open("./Data/words_all.txt", ios::in);
+		int i,j;
+		std::ifstream datafile;
+		datafile.open("./Data/words_all.txt", std::ios::in);
 		
-		string line;
+		std::string line;
 		
-		std::vector<string> word_list_all;
+		std::vector<std::string> word_list_all;
 		
 		if (datafile.is_open()){
 			while(getline(datafile,line)){
@@ -24,10 +23,36 @@ using namespace std;
 				
 			}
 		}else{
-			cout << "Error opening word file";
+			std::cout << "Error opening word file \n";
 		}
 		
-		cout << word_list_all.size()+'\n';
+		std::cout << word_list_all.size();
+		std::cout << "\n";
+		
+		std::string response;
+		
+		response = test_word("tipsy","split");
+		
+		std::cout << response + "\n";
+		
+		bool test;
+		
+		test = check_word("split",response,"tipsy");
+		
+		std::cout << test;
+		std::cout << "\n";
+		
+		std::vector<std::string> word_list_new;
+		
+		word_list_new = update_list("split",response,word_list_all);
+		
+
+	
+		std::string word;
+	
+		for(auto & word : word_list_new){
+			std::cout << word+"\n";
+		}
 		
 		return 0;
 	}

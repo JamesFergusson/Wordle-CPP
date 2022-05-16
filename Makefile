@@ -1,6 +1,6 @@
 # Desktop
 CC  := g++ 
-CFLAGS := 
+CFLAGS := -std=c++17
 LIBS := 
 
 
