@@ -84,7 +84,7 @@ int main(){
 	word_list_new = word_list_all;
 	
 	while(response!="ggggg"){
-
+		// Remove incorrect words from list of possible solutions
 		word_list_new = update_list(guess,response,word_list_new);
 		
 		std::cout << "\nThere are ";
@@ -100,6 +100,7 @@ int main(){
 		}
 		std::cout << "Calculating next best guesses...\n";
 		
+		// select random sub-sample of list for scoring
 		int score;
 		std::shuffle(word_list_new.begin(), word_list_new.end(), rng);
 	
@@ -117,20 +118,29 @@ int main(){
 		
 		std::vector<wordscore> scored_list;
 		wordscore tmp;
-
+		
+		// score list to select best guesses
+		// Method is to check for each guess word
+		// and each possible answer from the sub sample
+		// how many words would be compatible with the 
+		// information gained from that guess
 		for(auto & guess : word_list_all){
 			score = 0;
 			for(auto & answer : word_list_sml){
 				response = test_word(guess,answer);
 				for(auto & word : word_list_sml){
-					score += check_word(guess,response,word);
+					if(test_word(guess,word)==response){
+						score +=1;
+					}
 				}	
 			}
 			tmp.score = score/sample;
 			tmp.word = guess;
 			scored_list.push_back(tmp);
 		}
-	
+		
+		// select the words with the smallest scores
+		// hence maximising the reduction of possible answers
 		std::sort(scored_list.begin(),scored_list.end());
 
 		std::cout << "The top ten guesses are:\n";
@@ -139,6 +149,23 @@ int main(){
 			std::cout << scored_list[i].word;
 			std::cout << "\t";
 		}
+		std::cout << "]\n";
+		
+		std::cout << "The top ten solutions are:\n";
+		std::cout << "[";
+		i=0;
+		for(j=0;j<scored_list.size();j++){
+			for(auto & word : word_list_sml){
+				if (word == scored_list[j].word){
+					std::cout << word;
+					std::cout << "\t";
+					i++;
+					continue;
+				}
+			}
+			if(i>9) break;
+		}
+		
 		std::cout << "]\n";
 		
 		std::cout << "\nEnter your guess now:\n";

@@ -1,6 +1,14 @@
 #include <string>
 #include <vector>
 
+std::vector<int> convert_word(std::string word){
+	std::vector<int> word_int;
+	int letter;
+	for (char const &c: s){
+		word_int.push_back((int)c);
+	}
+	return word_int;
+}
 
 std::string test_word(std::string guess, std::string answer){
 /*  ************************************************
@@ -17,10 +25,20 @@ std::string test_word(std::string guess, std::string answer){
 	response :: A 5 letter response string containing the information
 			    wordle would return. in the string b=black
 			    y=yellow, and g=green
+	
+	Note: The rules of wordle are not correct as stated on the site
+	repeated letters are treated seperatly so:
+	guess = 'shoot' and answer = 'bloat' will return:
+	bbgbg not bbgyg as the second 'o' can't match with already matched 'o'
+	in the answer.  This is also true for yellow matches.  
+	To avoid this we must remove matched letters so they can't be matched again
 	************************************************ */
 	
 	int i,j;
 	
+	// std::vector<int> guess_int = convert_word(guess);
+	// std::vector<int> answer_int = convert_word(answer);
+		
 	// Set default to all black
 	std::string response = "bbbbb";
 	
@@ -28,12 +46,20 @@ std::string test_word(std::string guess, std::string answer){
 		// Check for green matches
 		if(guess[i]==answer[i]){
 			response[i] = 'g';
-		}else{
-			for(j=0;j<5;j++){
-				// Check for yellow matches being careful to avoid green clashes
-				if(guess[i]==answer[j] && guess[j]!=answer[j]){
-					response[i] = 'y';
-				}
+			// change to dummy values to exclude from future yellow searches
+			guess[i] = '0';
+			answer[i] = '1';
+		}
+	}
+	
+	for(i=0;i<5;i++){
+		for(j=0;j<5;j++){
+			// Check for yellow matches
+			if(guess[i]==answer[j]){
+				response[i] = 'y';
+			// change to dummy values to exclude from future yellow searches
+				guess[i] = '0';
+				answer[j] = '1';
 			}
 		}
 	}
@@ -42,36 +68,6 @@ std::string test_word(std::string guess, std::string answer){
 	return response;
 }
 
-bool check_word(std::string guess, std::string response, std::string word){
-/*  ************************************************
-	Takes a guess word and a response and checks
-	is a given word could be a solution
-	
-	input:
-	
-	guess    :: A 5 letter string containing the guess word
-	response :: A 5 letter response string containing the information
-			    wordle would return. in the string b=black
-			    y=yellow, and g=green
-	word     :: A 5 letter string containing the possible solution word
-	
-	returns:
-	
-	bool     :: returns 1 if the word could be a solution and
-			 :: 0 if the word could not be a solution
-	************************************************ */	
-	int i,j;
-	bool test;
-	bool compatible;
-	
-	if(test_word(guess,word)==response){
-		compatible = true;
-	}else{
-		compatible = false;
-	}
-	
-	return compatible;
-}
 
 std::vector<std::string> update_list(std::string guess, std::string response, std::vector<std::string> word_list){
 /*  ************************************************
@@ -97,8 +93,8 @@ std::vector<std::string> update_list(std::string guess, std::string response, st
 	
 	std::string word;
 	
-	for(auto & word : word_list){
-		if(check_word(guess,response,word)){
+	for(auto &word : word_list){
+		if(test_word(guess,word)==response){
 			word_list_new.push_back(word);
 		}
 		
