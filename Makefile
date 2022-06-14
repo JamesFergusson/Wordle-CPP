@@ -1,14 +1,14 @@
 # Desktop
 CC  := g++ 
-CFLAGS := -std=c++20
+CFLAGS := -std=c++17 -O3
 LIBS := 
-
 
 # dirs
 
 SRCDIR := Code
 OBJDIR := Objects
 BINDIR := .
+INCLDIR := include
 
 
 # files
@@ -29,6 +29,9 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	$(CC) $(CFLAGS) -I$(SRCDIR) -c $< -o $@ 
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.h
+
+optimized :  main_optimized.cpp
+	$(CC) $(CFLAGS) -I$(INCLDIR) $^  -o $(BINDIR)/optimized_wordle.x
 
 clean:
 	rm -f $(OBJDIR)/*.o $(PROGRAMS)
