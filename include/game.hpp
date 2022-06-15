@@ -35,7 +35,8 @@ private:
     void print_word(const std::array<T,WORD_LENGTH>& word);
     void print_words();
     void update_list();
-    std::array<int,WORD_LENGTH> test_word(const std::array<T,WORD_LENGTH>& word);
+    std::array<int,WORD_LENGTH> test_word_weird_rules (const std::array<T,WORD_LENGTH>& word);
+    std::array<int,WORD_LENGTH> test_word (const std::array<T,WORD_LENGTH>& word);
     void create_words_sample();
     void calculate_scores_guesses();
     void calculate_scores_solutions();
@@ -158,7 +159,7 @@ template<typename T> void CGame<T>::update_list() {
     //having a local variable will mitigate the damage a bit
     temp_words.reserve(words.size());
     for (auto & word : words) {
-        auto response_test=test_word(word);
+        auto response_test=test_word_weird_rules (word);
         if (response_test==response){
             temp_words.push_back(word);
         }
@@ -184,6 +185,38 @@ std::array<int,WORD_LENGTH> CGame<T>::test_word (const std::array<T, WORD_LENGTH
             }//for inner loop
         }//if-else green case
 	}//for
+	return response_test;
+}//test_word_weird_rules
+
+
+template<typename T> 
+std::array<int,WORD_LENGTH> CGame<T>::test_word_weird_rules(const std::array<T, WORD_LENGTH>& word ) {
+    std::array<int,WORD_LENGTH> response_test;
+    //if we passed by value, the copy of "word" would have been made automatically
+    //however, as we also need a copy of guess this will become confusing
+    //it's better to copy both manually
+    std::array<T,WORD_LENGTH> guess2(guess);
+    std::array<T,WORD_LENGTH> word2(word);
+    response_test.fill(0);//reset the variable to "all black"
+    
+    for(int i=0;i<WORD_LENGTH;i++){
+		// Check for green matches
+		if(guess2[i]==word2[i]){
+			response_test[i] = 2;
+			guess2[i] = -2;
+			word2[i] = -1;
+		}
+	}
+	for(int i=0;i<WORD_LENGTH;i++){
+		for(int j=0;j<WORD_LENGTH;j++){
+			if(guess2[i]==word2[j]){
+				response_test[i] = 1;
+				guess2[i]=-2;
+				word2[j]=-1;
+			}
+		}
+	}
+    
 	return response_test;
 }//test_word
 
@@ -245,10 +278,10 @@ template<typename T> void CGame<T>::calculate_scores_guesses() {
         guess = words[i];
         for(int j=0;j<sample_size;j++){
             potential_answer = words_sample[j];
-            response=test_word(potential_answer);
+            response=test_word_weird_rules (potential_answer);
             for(int k=0;k<sample_size;k++){
                 word = words_sample[k];
-                response_test=test_word(word);
+                response_test=test_word_weird_rules (word);
                 if(response==response_test){
                     score += 1;
                 }
@@ -290,10 +323,10 @@ template<typename T> void CGame<T>::calculate_scores_solutions() {
         guess = words_sample[i];
         for(int j=0;j<sample_size;j++){
             potential_answer = words_sample[j];
-            response=test_word(potential_answer);
+            response=test_word_weird_rules (potential_answer);
             for(int k=0;k<sample_size;k++){
                 word = words_sample[k];
-                response_test=test_word(word);
+                response_test=test_word_weird_rules (word);
                 if(response==response_test){
                     score += 1;
                 }
